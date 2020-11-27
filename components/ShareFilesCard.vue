@@ -9,13 +9,7 @@
         title: 'Demo share files',
         text: 'Screenshots'
       </pre>
-      <v-file-input
-        show-size
-        counter
-        multiple
-        label="File input"
-        @change="changeFiles"
-      />
+      <v-file-input show-size label="File input" @change="changeFile" />
     </v-card-text>
     <v-card-actions>
       <v-btn color="blue" @click="share">Share</v-btn>
@@ -30,7 +24,7 @@ export default {
   data() {
     return {
       message: '',
-      files: [],
+      file: [],
     }
   },
 
@@ -43,11 +37,14 @@ export default {
   },
 
   methods: {
-    async share() {
-      if (navigator.canShare) {
+    async shareFile() {
+      const files = Object.freeze([this.file]) // share API require frozen array
+      const canShare = navigator.canShare && navigator.canShare({ files })
+      if (canShare) {
         this.message = 'navigator.canShare'
         try {
           await navigator.share({
+            files,
             title: 'Demo share files',
             text: 'Screenshots',
           })
@@ -59,8 +56,8 @@ export default {
       this.message = 'navigator.canShare === false'
     },
 
-    changeFiles(files) {
-      this.files = files
+    changeFile(file) {
+      this.file = file
     },
   },
 }
